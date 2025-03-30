@@ -1,0 +1,33 @@
+# Binaries
+flux-helpers
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output folders
+bin/
+build/
+dist/
+render/
+
+# Test & coverage
+*.test
+*.out
+coverage.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env
