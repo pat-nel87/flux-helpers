@@ -20,4 +20,5 @@ jobs:
             ghcr.io/my-org/my-api=1.3.10
             busybox=1.38.2
             alpine=3.42.42
+          dry-run: true
 
