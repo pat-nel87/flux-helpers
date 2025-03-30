@@ -1,11 +1,8 @@
 name: Release flux-helpers CLI
 
 on:
-  push:
-    branches:
-      - main
-      - release/**
-
+  workflow_dispatch:
+    
 jobs:
   release:
     name: Build, Test, and Release
@@ -44,7 +41,7 @@ jobs:
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.bump.outputs.new_version }}
           name: Release ${{ steps.bump.outputs.new_version }}
