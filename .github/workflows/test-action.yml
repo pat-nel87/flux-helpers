@@ -16,8 +16,8 @@ jobs:
         uses: github-hacktions/flux-helm-bump@main
         with:
           file: test_files/multiple-bump.yaml
-          set: |
+          set: | 
             ghcr.io/my-org/my-api=1.3.10
             busybox=1.38.2
             alpine=3.42.42
-          dry-run: true
+
