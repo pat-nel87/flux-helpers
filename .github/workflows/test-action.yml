@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: test github hacktion
-        uses: github-hacktions/flux-helpers-action@main
+        uses: github-hacktions/flux-helm-bump@main
         with:
           file: test_files/multiple-bump.yaml
           set: |
