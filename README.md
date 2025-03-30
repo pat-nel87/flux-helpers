@@ -44,3 +44,33 @@ Flag	Description
 --file, -f	Path to your HelmRelease YAML file
 --set	One or more repository=version updates
 --dry-run	If true, prints updates without writing file
+```
+
+### 🐳 Using flux-helpers with Docker
+🚀 Run without installing Go
+You can run flux-helpers fully containerized, no local Go install required:
+
+```bash
+docker run --rm \
+  -v $PWD:/workdir \
+  ghcr.io/your-org/flux-helpers:latest \
+  bump \
+  --file /workdir/test_files/multiple-bump.yaml \
+  --set ghcr.io/my-org/my-api=1.3.99 \
+  --dry-run
+```
+### 🧪 Run Unit Tests in Docker
+
+```bash
+docker build --build-arg TEST=true -t flux-helpers:test .
+```
+
+### 🧬 Run Fuzz Testing 
+
+```bash
+docker build \
+  --build-arg FUZZ=true \
+  --build-arg FUZZTIME=1m \
+  -t flux-helpers:fuzz .
+```
+
