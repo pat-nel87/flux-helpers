@@ -1,0 +1,54 @@
+name: Release flux-helpers CLI
+
+on:
+  push:
+    branches:
+      - main
+      - release/**
+
+jobs:
+  release:
+    name: Build, Test, and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+
+      - name: Run tests
+        run: go test -v 
+
+      - name: Build binary
+        run: |
+          mkdir -p dist
+          GOOS=linux GOARCH=amd64 go build -o dist/flux-helpers
+
+      - name: Get current version
+        id: get_version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Current version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bump patch version
+        id: bump
+        run: |
+          OLD=${{ steps.get_version.outputs.version }}
+          PATCH=$(echo "$OLD" | awk -F. '{print $3+1}')
+          NEW="v$(echo $OLD | awk -F. '{print $1"."$2}').$PATCH"
+          echo "new_version=$NEW" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.bump.outputs.new_version }}
+          name: Release ${{ steps.bump.outputs.new_version }}
+          files: |
+            dist/flux-helpers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

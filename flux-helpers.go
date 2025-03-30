@@ -1,3 +1,17 @@
+// Package provides utilities for managing and updating container image tags
+// within HelmRelease YAML files. It includes functions for validating semantic
+// versioning, searching for image blocks in nested map structures, and updating
+// image tags either individually or in bulk.
+//
+// The package is designed to work with FluxCD HelmRelease resources, enabling
+// users to automate the process of bumping image tags in a declarative manner.
+//
+// Key Functions:
+// - isValidSemver: Validates semantic versioning strings.
+// - findImageBlocks: Searches for image blocks matching a specific repository name.
+// - BumpTagInValues: Updates the image tag for a specific container image in a nested map.
+// - BumpMultipleTags: Updates multiple image tags in a HelmRelease YAML file.
+// - BumpSingleTag: Simplifies single-image updates by wrapping BumpMultipleTags.
 package main
 
 import (
