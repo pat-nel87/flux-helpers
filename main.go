@@ -6,22 +6,23 @@
 // The main command is defined using the Cobra library and includes the
 // following subcommands:
 //
-// - bump: Allows users to update one or more image tags in a specified
-//   HelmRelease YAML file. The command supports dry-run mode for previewing
-//   changes without modifying the file.
+//   - bump: Allows users to update one or more image tags in a specified
+//     HelmRelease YAML file. The command supports dry-run mode for previewing
+//     changes without modifying the file.
 //
 // Flags for the `bump` command:
-// - --file (-f): Specifies the path to the HelmRelease YAML file.
-// - --set: Specifies image updates in the form "repo=version". This flag
-//   can be repeated to update multiple images.
-// - --dry-run: Enables preview mode to display changes without applying them.
+//   - --file (-f): Specifies the path to the HelmRelease YAML file.
+//   - --set: Specifies image updates in the form "repo=version". This flag
+//     can be repeated to update multiple images.
+//   - --dry-run: Enables preview mode to display changes without applying them.
 //
 // The `splitArg` helper function is used to parse the "repo=version" format
 // into its components, and the `BumpMultipleTags` function (not included in
 // this code) is responsible for applying the updates to the YAML file.
 //
 // Usage example:
-//   flux-helpers bump --file path/to/helmrelease.yaml --set repo1=version1 --set repo2=version2
+//
+//	flux-helpers bump --file path/to/helmrelease.yaml --set repo1=version1 --set repo2=version2
 package main
 
 import (
@@ -61,7 +62,7 @@ var bumpCmd = &cobra.Command{
 			updates[parts[0]] = parts[1]
 		}
 
-		err := BumpMultipleTags(filePath, updates, dryRun)
+		err := BumpMultipleTagsUniversalAndSanitize(filePath, updates, dryRun)
 		if err != nil {
 			return fmt.Errorf("failed to bump tags: %w", err)
 		}

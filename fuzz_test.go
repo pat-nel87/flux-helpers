@@ -2,38 +2,50 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
-    "os"
+
 	"sigs.k8s.io/yaml"
 )
 
-// FuzzBumpTagInValues is a fuzz test for the BumpTagInValues function. It tests
-// the function's behavior with various inputs to ensure it handles edge cases
-// and malformed data gracefully without crashing or corrupting the structure.
+// FuzzBumpTagInValuesUniversal is a fuzz test for the BumpTagInValuesUniversal function.
+// It tests the function's ability to handle various YAML inputs and ensures that the
+// structure of the input is not corrupted after processing.
 //
-// The test uses a seed input from a YAML file ("test_files/multiple-bump.yaml")
-// to initialize the fuzzing process. It then generates random inputs for the
-// YAML content, repository, and tag.
+// The test uses seed files containing YAML data to initialize the fuzzing process.
+// Each seed file represents a different style of YAML structure, such as traditional
+// container blocks or Aspire-style images maps.
 //
 // The fuzzing function performs the following steps:
-// 1. Attempts to unmarshal the YAML input into a map structure.
-// 2. Validates the presence and type of the "spec" and "values" fields.
-// 3. Calls BumpTagInValues with the parsed "values" map, repository, and tag.
-// 4. Ensures the structure remains valid by marshaling it back to JSON.
+//  1. Parses the YAML input into a map structure.
+//  2. Extracts the "spec" and "values" fields from the parsed YAML.
+//  3. Runs the BumpTagInValuesUniversal function in dry-run mode to simulate tag bumping.
+//  4. Verifies that the structure of the "values" field remains valid by attempting to
+//     marshal it back into JSON.
 //
-// This test is designed to identify potential crashes or data corruption issues
-// in the BumpTagInValues function when handling unexpected or malformed inputs.
-func FuzzBumpTagInValues(f *testing.F) {
-	// Seed input: real YAML that works
-	data, err := os.ReadFile("test_files/multiple-bump.yaml")
-	if err == nil {
-		f.Add(string(data), "ghcr.io/my-org/my-api", "1.3.999")
+// If the YAML input is invalid or the required fields are missing, the test skips
+// further processing for that input.
+//
+// This test ensures that the BumpTagInValuesUniversal function can handle a wide range
+// of inputs without causing structural corruption or runtime errors.
+func FuzzBumpTagInValuesUniversal(f *testing.F) {
+	// Seed inputs
+	seedFiles := []string{
+		"test_files/structured-values.yaml", // traditional container blocks
+		"test_files/aspire-values.yaml",     // Aspire-style images map
+	}
+
+	for _, file := range seedFiles {
+		data, err := os.ReadFile(file)
+		if err == nil {
+			f.Add(string(data), "ghcr.io/my-org/my-api", "1.3.999")
+		}
 	}
 
 	f.Fuzz(func(t *testing.T, yamlInput, repo, tag string) {
 		var doc map[string]interface{}
 		if err := yaml.Unmarshal([]byte(yamlInput), &doc); err != nil {
-			return // skip malformed YAML
+			return // Skip bad YAML
 		}
 
 		spec, ok := doc["spec"].(map[string]interface{})
@@ -51,10 +63,12 @@ func FuzzBumpTagInValues(f *testing.F) {
 			return
 		}
 
-		// Just see if we crash
-		_, _ = BumpTagInValues(values, repo, tag, true)
+		// Run the bump logic (dry run)
+		_, _ = BumpTagInValuesUniversal(values, repo, tag, true)
 
-		// Marshal to ensure we didn't corrupt the structure
-		_, _ = json.Marshal(values)
+		// Verify no structural corruption
+		if _, err := json.Marshal(values); err != nil {
+			t.Errorf("❌ Structure corrupted after bumping: %v", err)
+		}
 	})
 }
