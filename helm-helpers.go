@@ -12,6 +12,27 @@ import (
 	"strings"
 )
 
+// InjectImagePullSecrets injects an optional imagePullSecrets configuration into a Helm chart's deployment.yaml
+// template and ensures the corresponding field exists in the chart's values.yaml file.
+//
+// This function performs the following steps:
+// 1. Loads the Helm chart from the specified directory.
+// 2. Searches for the deployment.yaml template in the chart and injects a conditional block for imagePullSecrets
+//    under the `spec` section if it doesn't already exist.
+// 3. Ensures the `image.imagePullSecret` field exists in the chart's values.yaml file, adding it if necessary.
+// 4. Renders the chart with the updated values for preview purposes.
+//
+// Parameters:
+//   - chartDir: The path to the Helm chart directory.
+//
+// Returns:
+//   - An error if any step fails, or nil if the operation completes successfully.
+//
+// Example usage:
+//   err := InjectImagePullSecrets("/path/to/chart")
+//   if err != nil {
+//       log.Fatalf("Failed to inject imagePullSecrets: %v", err)
+//   }
 func InjectImagePullSecrets(chartDir string) error {
 	// Step 1: Load the chart
 	ch, err := loader.Load(chartDir)
