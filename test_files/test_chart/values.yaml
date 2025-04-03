@@ -1,0 +1,9 @@
+image:
+  imagePullSecret: ""
+  pullPolicy: IfNotPresent
+  repository: nginx
+  tag: latest
+imagePullSecrets:
+- my-registry-secret
+replicaCount: 1
+resources: {}

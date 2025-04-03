@@ -37,6 +37,7 @@ var (
 	filePath string
 	tagArgs  []string
 	dryRun   bool
+	chartPath string
 )
 
 var rootCmd = &cobra.Command{
@@ -71,12 +72,33 @@ var bumpCmd = &cobra.Command{
 	},
 }
 
+var injectCmd = &cobra.Command{
+	Use:   "inject-helm-condition",
+	Short: "Inject conditional block into Helm deployment.yaml templates",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if chartPath == "" {
+			return fmt.Errorf("you must specify --chart pointing to a Helm chart directory")
+		}
+
+		err := InjectImagePullSecrets(chartPath)
+		if err != nil {
+			return fmt.Errorf("failed to inject: %w", err)
+		}
+
+		fmt.Println("✅ Injection complete")
+		return nil
+	},
+}
+
+
 func init() {
 	bumpCmd.Flags().StringVarP(&filePath, "file", "f", "", "Path to HelmRelease YAML file")
 	bumpCmd.Flags().StringArrayVar(&tagArgs, "set", nil, "Image update(s) in the form repo=version (repeatable)")
 	bumpCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Preview changes without modifying the file")
-
+    
+	injectCmd.Flags().StringVar(&chartPath, "chart", "", "Path to Helm chart directory")
 	rootCmd.AddCommand(bumpCmd)
+	rootCmd.AddCommand(injectCmd)
 }
 
 func main() {

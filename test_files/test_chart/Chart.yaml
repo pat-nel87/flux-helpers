@@ -1,0 +1,6 @@
+apiVersion: v2
+name: test-chart               # 👈 THIS is required!
+description: A test chart for flux-helpers
+type: application
+version: 0.1.0
+appVersion: "1.0"
