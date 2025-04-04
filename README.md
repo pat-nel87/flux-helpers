@@ -73,4 +73,41 @@ docker build \
   --build-arg FUZZTIME=1m \
   -t flux-helpers:fuzz .
 ```
+### 🧰 Helm Helpers
+inject-helm-condition
+Automatically injects a conditional imagePullSecrets block into a Helm chart’s deployment.yaml and updates values.yaml accordingly.
+
+```bash
+flux-helpers inject-helm-condition --chart ./charts/my-service
+```
+
+What it does:
+🔧 Finds any templates/*deployment.yaml in your chart directory
+
+🩺 Injects the following block under spec.template.spec:
+
+```yaml
+{{- if .Values.image.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.image.imagePullSecret }}
+{{- end }}
+```
+
+📝 Ensures values.yaml contains:
+
+```yaml
+image:
+  imagePullSecret: ""
+```
+
+### 🔍 Renders the modified chart using Helm libraries for preview/debug
+
+Example with Docker:
+```bash
+docker run --rm \
+  -v $PWD:/chart \
+  ghcr.io/your-org/flux-helpers:latest \
+  inject-helm-condition --chart /chart
+This helper is ideal for automating image pull secret logic across multiple charts in your GitOps pipeline.
+```
 
